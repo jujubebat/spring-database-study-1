@@ -2,7 +2,7 @@ package hello.jdbc.domain;
 
 import lombok.Data;
 
-@Data
+@Data // equals, hashCode, toString, getter, setter 자동 생성
 public class Member {
 
     private String memberId;
