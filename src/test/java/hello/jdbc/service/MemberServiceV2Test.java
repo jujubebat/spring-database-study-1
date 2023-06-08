@@ -5,10 +5,11 @@ import static hello.jdbc.connection.ConnectionConst.URL;
 import static hello.jdbc.connection.ConnectionConst.USERNAME;
 import hello.jdbc.domain.Member;
 import hello.jdbc.repository.MemberRepositoryV1;
+import hello.jdbc.repository.MemberRepositoryV2;
+import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import org.junit.jupiter.api.AfterEach;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,23 +18,24 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import java.sql.SQLException;
 
 /**
- * 기본 동작, 트랜잭션이 없어서 문제 발생
+ * 트랜잭션 - 커넥션 파라미터 전달 방식 동기화
  */
-class MemberServiceV1Test {
+@Slf4j
+class MemberServiceV2Test {
 
     public static final String MEMBER_A = "memberA";
     public static final String MEMBER_B = "memberB";
     public static final String MEMBER_EX = "ex";
 
-    private MemberRepositoryV1 memberRepository;
-    private MemberServiceV1 memberService;
+    private MemberRepositoryV2 memberRepository;
+    private MemberServiceV2 memberService;
 
 
     @BeforeEach
     void before() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource(URL, USERNAME, PASSWORD);
-        memberRepository = new MemberRepositoryV1(dataSource);
-        memberService = new MemberServiceV1(memberRepository);
+        memberRepository = new MemberRepositoryV2(dataSource);
+        memberService = new MemberServiceV2(dataSource, memberRepository);
     }
 
     @AfterEach
@@ -54,7 +56,9 @@ class MemberServiceV1Test {
         memberRepository.save(memberB);
 
         //when
+        log.info("START TX");
         memberService.accountTransfer(memberA.getMemberId(), memberB.getMemberId(), 2000);
+        log.info("END TX");
 
         //then
         Member findMemberA = memberRepository.findById(memberA.getMemberId());
@@ -65,7 +69,7 @@ class MemberServiceV1Test {
     }
 
     @Test
-    @DisplayName("이체중 예외 발생(트랜잭션 적용 안돼서 롤백 안되는 경우)")
+    @DisplayName("이체중 예외 발생(트랜잭션 적용 돼서 롤백 되는 경우)")
     void accountTransferEx() throws SQLException {
         //given
         Member memberA = new Member(MEMBER_A, 10000);
@@ -82,7 +86,7 @@ class MemberServiceV1Test {
         //then
         Member findMemberA = memberRepository.findById(memberA.getMemberId());
         Member findMemberB = memberRepository.findById(memberEx.getMemberId());
-        Assertions.assertThat(findMemberA.getMoney()).isEqualTo(8000);
+        Assertions.assertThat(findMemberA.getMoney()).isEqualTo(10000);
         Assertions.assertThat(findMemberB.getMoney()).isEqualTo(10000);
     }
 

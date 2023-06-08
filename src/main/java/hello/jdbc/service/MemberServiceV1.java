@@ -15,7 +15,8 @@ public class MemberServiceV1 {
         Member fromMember = memberRepository.findById(fromId);
         Member toMember = memberRepository.findById(toId);
 
-        //기본적으로 automcommit ture 이기 때문에 update 쿼리마다 commit 발생함
+        //기본적으로 auto commit ture 이기 때문에 update 쿼리마다 commit 발생함
+        //트랜잭션 적용이 안되는 케이스
         memberRepository.update(fromId, fromMember.getMoney() - money); // commit 발생
         validation(toMember);
         memberRepository.update(toId, toMember.getMoney() + money); // commit 발생
