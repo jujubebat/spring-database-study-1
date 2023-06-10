@@ -1,11 +1,13 @@
 package hello.jdbc.exception.basic;
 
+import lombok.extern.slf4j.Slf4j;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import org.junit.jupiter.api.Test;
 
 import java.net.ConnectException;
 import java.sql.SQLException;
 
+@Slf4j
 public class UnCheckedAppTest {
 
     @Test
@@ -14,6 +16,16 @@ public class UnCheckedAppTest {
 
         assertThatThrownBy(controller::request)
             .isInstanceOf(RuntimeSQLException.class);
+    }
+
+    @Test
+    void printEx(){
+        Controller controller = new Controller();
+        try {
+            controller.request();
+        } catch (Exception e) {
+            log.info("ex", e);
+        }
     }
 
     static class Controller {
