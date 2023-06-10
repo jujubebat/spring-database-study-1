@@ -5,7 +5,6 @@ import static hello.jdbc.connection.ConnectionConst.URL;
 import static hello.jdbc.connection.ConnectionConst.USERNAME;
 import hello.jdbc.domain.Member;
 import hello.jdbc.repository.MemberRepositoryV3;
-import hello.jdbc.service.MemberServiceV3_1;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -20,17 +19,17 @@ import org.springframework.transaction.PlatformTransactionManager;
 import java.sql.SQLException;
 
 /**
- * 트랜잭션 - 트랜잭션 템플릿
+ * 트랜잭션 - 트랜잭션 매니저
  */
 @Slf4j
-class MemberServiceV3Test_2Test {
+class MemberServiceV3_1Test {
 
     public static final String MEMBER_A = "memberA";
     public static final String MEMBER_B = "memberB";
     public static final String MEMBER_EX = "ex";
 
     private MemberRepositoryV3 memberRepository;
-    private MemberServiceV3_2 memberService;
+    private MemberServiceV3_1 memberService;
 
 
     @BeforeEach
@@ -39,7 +38,7 @@ class MemberServiceV3Test_2Test {
         memberRepository = new MemberRepositoryV3(dataSource);
         PlatformTransactionManager transactionManager = new DataSourceTransactionManager(dataSource);
         //DataSourceTransactionManager는 Jdbc 트랜잭션 매니저
-        memberService = new MemberServiceV3_2(transactionManager, memberRepository);
+        memberService = new MemberServiceV3_1(transactionManager, memberRepository);
     }
 
     @AfterEach
